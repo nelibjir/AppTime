@@ -1,40 +1,78 @@
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using AppTime.IoC;
+using System.Reflection;
+using AppTime.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Console;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AppTime.Configs;
+using AppTime.Middlewares;
 
 namespace AppTime
 {
 	public class Startup
 	{
-		// This method gets called by the runtime. Use this method to add services to the container.
-		// For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+		public IConfiguration Configuration { get; }
+
+		private static readonly log4net.ILog fLog = log4net.LogManager.GetLogger(typeof(Startup));
+		private const string _ConfigurationSectionName = "DbConnectionConfiguration:ConnectionString";
+
+		public Startup(ILogger<Startup> logger, IConfiguration configuration)
+		{
+			Configuration = configuration;
+		}
 		public void ConfigureServices(IServiceCollection services)
 		{
+			services
+				.AddMvc()
+				.SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+			services.AddCors();
+
+			DbEnvironment.DefaultDbConnectionString = Configuration
+			 .GetSection(_ConfigurationSectionName)
+			 .Value;
+
+			services.AddDbContext<DataContext>(SetupDbContext);
+
+			services.AddAdapters();
+			services.AddFactories();
+			services.AddHandlers();
+			services.AddRepositories();
+			services.AddServices();
+			services.AddMediatR(typeof(Startup).GetTypeInfo().Assembly);
 		}
 
-		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
 		{
-			if (env.IsDevelopment())
+			app.UseCors(CorsConfig.SetupCors);
+			app.UseMiddleware<ExceptionMiddleware>();
+			app.UseMiddleware<DbTransactionMiddleware>();
+
+			app.UseHsts();
+			app.UseHttpsRedirection();
+
+			using (IServiceScope serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
 			{
-				app.UseDeveloperExceptionPage();
+				DataContext context = serviceScope.ServiceProvider.GetRequiredService<DataContext>();
+				context.Database.Migrate();
 			}
 
-			app.UseRouting();
+			loggerFactory.AddLog4Net();
+			app.UseMvc();
+		}
 
-			app.UseEndpoints(endpoints =>
-			{
-				endpoints.MapGet("/", async context =>
-				{
-					await context.Response.WriteAsync("Hello World!");
-				});
-			});
+		private void SetupDbContext(DbContextOptionsBuilder optionsBuilder)
+		{
+			LoggerFactory f = new LoggerFactory(new[] { new ConsoleLoggerProvider((m, l) => true, true) });
+			optionsBuilder.UseLoggerFactory(f);
+			optionsBuilder.UseSqlServer(DbEnvironment.DbConnectionString);
 		}
 	}
 }
