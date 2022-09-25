@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 
 namespace AppTime.Services
 {
-	public interface IFormatService
+	public interface IJsonFormatterService
 	{
-		string CreateJsonFromXml(string name);
+		string CreateJsonFromXml(string xml);
 		Task<DataFileDto> GetPathsAsync(string name, CancellationToken cancellationToken);
 	}
 }

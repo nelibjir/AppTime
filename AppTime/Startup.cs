@@ -9,8 +9,6 @@ using AppTime.IoC;
 using System.Reflection;
 using AppTime.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging.Console;
-using System;
 using AppTime.Configs;
 using AppTime.Middlewares;
 
@@ -70,8 +68,11 @@ namespace AppTime
 
 		private void SetupDbContext(DbContextOptionsBuilder optionsBuilder)
 		{
-			LoggerFactory f = new LoggerFactory(new[] { new ConsoleLoggerProvider((m, l) => true, true) });
-			optionsBuilder.UseLoggerFactory(f);
+			var logger = LoggerFactory.Create(config =>
+			{
+				config.AddConsole();
+			});
+			optionsBuilder.UseLoggerFactory(logger);
 			optionsBuilder.UseSqlServer(DbEnvironment.DbConnectionString);
 		}
 	}

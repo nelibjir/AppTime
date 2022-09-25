@@ -6,7 +6,6 @@ namespace AppTime.IoC
 	{
 		public static void AddAdapters(this IServiceCollection services)
 		{
-			services.AddTransient<IStringUtilAdapter, StringUtilAdapter>();
 		}
 	}
 }

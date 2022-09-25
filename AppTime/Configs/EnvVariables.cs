@@ -1,4 +1,4 @@
-﻿namespace Shipvio.Server.Supervisor.Service.Configs
+﻿namespace AppTime.Configs
 {
 	public class EnvVariables
 	{

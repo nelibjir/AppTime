@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using AppTime.Services;
+using AppTime.Services.FileServices;
 
 namespace AppTime.IoC
 {
@@ -7,7 +8,8 @@ namespace AppTime.IoC
 	{
 		public static void AddServices(this IServiceCollection services)
 		{
-			services.AddTransient<IFormatService, FormatterService>();
+			services.AddTransient<IJsonFormatterService, JsonFormatterService>();
+			services.AddTransient<IFileService, FileService>();
 		}
 	}
 }

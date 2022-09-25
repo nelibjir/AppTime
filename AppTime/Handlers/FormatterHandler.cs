@@ -9,19 +9,18 @@ using System;
 using AppTime.Exceptions;
 using System.Xml.Linq;
 using AppTime.Dtos;
-using Shipvio.Server.Supervisor.Service.Configs;
+using AppTime.Configs;
 
 namespace AppTime.Handlers
 {
     public class FormatterHandler :
-      IRequestHandler<CreateJsonCommand>,
-      IRequestHandler<GetDatasetNamesCommand, DatasetNames>
+      IRequestHandler<CreateJsonCommand>
     {
         private readonly IFileService fFileService;
-        private readonly IFormatService fFormatService;
+        private readonly IJsonFormatterService fFormatService;
 
         public FormatterHandler(
-          IFormatService formatService,
+          IJsonFormatterService formatService,
           IFileService fileService
           )
         {
@@ -45,11 +44,6 @@ namespace AppTime.Handlers
             await fFileService.WriteFileToDiskAsync(json, paths.Destination, null, cancellationToken);
 
 			return Unit.Value;
-        }
-
-        public async Task<DatasetNames> Handle(GetDatasetNamesCommand request, CancellationToken cancellationToken)
-        {
-            return await fDatasetServicecs.GetDatasetNamesAsync(cancellationToken);
         }
     }
 }

@@ -31,18 +31,5 @@ namespace AppTime.Entities
         }
 
         public virtual DbSet<FileExtension> FileExtension { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
-
-            modelBuilder.Entity<User>(entity =>
-            {
-                entity.HasIndex(e => e.UserId)
-                    .HasName("IX_user-user_id")
-                    .IsUnique();
-            });
-
-        }
     }
 }

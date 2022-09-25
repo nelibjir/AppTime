@@ -1,4 +1,6 @@
-﻿namespace AppTime.Configs
+﻿using AppTime.Entities;
+
+namespace AppTime.Configs
 {
 	public class DbConnectionConfiguration : IDbConnectionConfiguration
 	{

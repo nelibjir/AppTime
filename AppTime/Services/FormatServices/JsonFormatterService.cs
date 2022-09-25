@@ -9,11 +9,11 @@ using AppTime.Dtos;
 
 namespace AppTime.Services
 {
-	public class FormatterService : IFormatService
+	public class JsonFormatterService : IJsonFormatterService
 	{
 		private readonly IFileExtensionRepository fFileExtensionRepository;
 
-		public FormatterService(
+		public JsonFormatterService(
 		  IFileExtensionRepository fileExtensionRepository
 		  )
 		{
@@ -36,9 +36,9 @@ namespace AppTime.Services
 		}
 
 
-		public async Task<DataFileDto> GetPathsAsync(string name, CancellationToken cancellationToken)
+		public async Task<DataFileDto> GetPathsAsync(string extension_name, CancellationToken cancellationToken)
 		{
-			return await fFileExtensionRepository.GetPathByExtensionAsync(name, cancellationToken);
+			return await fFileExtensionRepository.GetPathByExtensionAsync(extension_name, cancellationToken);
 		}
 	}
 }
