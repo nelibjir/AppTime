@@ -1,13 +1,10 @@
 ﻿using AppTime.Services.FileServices;
 using MediatR;
-using AppTime.Api.Models;
 using AppTime.Commands;
 using AppTime.Services;
 using System.Threading;
 using System.Threading.Tasks;
 using System;
-using AppTime.Exceptions;
-using System.Xml.Linq;
 using AppTime.Dtos;
 using AppTime.Configs;
 
