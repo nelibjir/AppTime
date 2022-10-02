@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Threading.Tasks;
 using System.Threading;
-using System.Xml.Linq;
 using System;
 using AppTime.Api.Models;
 
@@ -23,19 +22,19 @@ namespace AppTime.Api.Controllers.V1
 		}
 
 		/// <summary>
-		/// Creates a new json file from the given format from query arguments, the source file is needed to be on the disk, 
-		/// location given by settings
+		/// Creates a new XML file from the given format from query arguments, the source file is needed to be on the disk, 
+		/// location is given by settings or in database table
 		/// </summary>
-		/// <param name="sourceFormat">Format from which we will convert to json</param>
+		/// <param name="sourceFormat">Format from which we will convert to xml</param>
 		/// <param name="cancellationToken">Cancellation token for the operation</param>
 		/// <returns>if successful returns name of the added dataset and code 201</returns>
 		/// <response code="201">Successfuly created</response>
-		/// <response code="404">XML file not found on disk.</response>
-		/// <response code="400">sourceFormat parameter is missing.</response>
+		/// <response code="404">Format file not found between supported files.</response>
+		/// <response code="400">SourceFormat parameter is missing.</response>
 		[HttpPost("/")]
 		[ProducesResponseType((int)HttpStatusCode.NotFound)]
 		[ProducesResponseType((int)HttpStatusCode.Created)]
-		public async Task<ActionResult> PostJsonFromXml(string sourceFormat, CancellationToken cancellationToken)
+		public async Task<ActionResult> PostXmlFromJson(string sourceFormat, CancellationToken cancellationToken)
 		{
 			if (String.IsNullOrEmpty(sourceFormat))
 			{
@@ -47,24 +46,24 @@ namespace AppTime.Api.Controllers.V1
 				throw new NotFoundException("outputFormat is not supported!");
 			}
 
+			// TODO change the command to CreateXMLCommand
 			await fMediator.Send(new CreateJsonCommand { FormatNameSource = sourceFormat }, cancellationToken);
 			return CreatedAtRoute(nameof(GetNewFile), null);
 		}
 
 		/// <summary>
-		/// Creates a new xml file from the given format from query arguments, the source file is in the body if the request 
-		/// location given by settings
+		/// Creates a new XML file from the given format from query arguments, the source file is in the body of the request 
 		/// </summary>
-		/// <param name="sourceFormat">Format from which we will convert to json</param>
+		/// <param name="sourceFormat">Format from which we will convert to XML</param>
 		/// <param name="source">Source which we should convert</param>
 		/// <param name="cancellationToken">Cancellation token for the operation</param>
 		/// <returns>if successful returns name of the added dataset and code 201</returns>
 		/// <response code="201">Successfuly created</response>
-		/// <response code="404">XML file not found on disk.</response>
+		/// <response code="404">Format file not found between supported files.</response>
 		[HttpPost("/")]
 		[ProducesResponseType((int)HttpStatusCode.NotFound)]
 		[ProducesResponseType((int)HttpStatusCode.Created)]
-		public async Task<ActionResult> PostJsonFromXmlInBody(string sourceFormat, [FromBody] string source, CancellationToken cancellationToken)
+		public async Task<ActionResult> PostXMLFromJsonInBody(string sourceFormat, [FromBody] string source, CancellationToken cancellationToken)
 		{
 			if (String.IsNullOrEmpty(sourceFormat))
 			{
@@ -92,7 +91,7 @@ namespace AppTime.Api.Controllers.V1
 		/// </summary>
 		/// <param name="name">Name of the file to be downloaded</param>
 		/// <param name="cancellationToken">Cancellation token</param>
-		/// <returns>if successful returns file as bytes and code 200</returns>
+		/// <returns>if successful returns file as object with content field which is string</returns>
 		/// <response code="200">Sucess</response>
 		/// <response code="400">Name is missing in the request</response>
 		/// <response code="404">Requested name was not found</response>
@@ -103,6 +102,7 @@ namespace AppTime.Api.Controllers.V1
 			if (string.IsNullOrEmpty(file_name))
 				throw new BadRequestException($"Please specify the name of the file");
 
+			// TODO a different xmlCommand which will return xml content, we shoul also check that the requested file is XML
 			return await fMediator.Send(new GetJsonFileCommand { FileName = file_name }, cancellationToken);
 		}
 	}

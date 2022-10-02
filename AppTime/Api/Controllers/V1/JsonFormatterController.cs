@@ -23,17 +23,18 @@ namespace AppTime.Api.Controllers.V1
 
 		/// <summary>
 		/// Creates a new json file from the given format from query arguments, the source file is needed to be on the disk, 
-		/// location given by settings
+		/// location is given by settings or in database table
 		/// </summary>
 		/// <param name="sourceFormat">Format from which we will convert to json</param>
 		/// <param name="cancellationToken">Cancellation token for the operation</param>
 		/// <returns>if successful returns code 201</returns>
 		/// <response code="201">Successfuly created</response>
-		/// <response code="404">XML file not found on disk.</response>
-		/// <response code="400">sourceFormat parameter is missing.</response>
+		/// <response code="404">Format file not found between supported files.</response>
+		/// <response code="400">SourceFormat parameter is missing.</response>
 		[HttpPost("/")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.Created)]
+		[ProducesResponseType((int)HttpStatusCode.BadRequest)]
+		[ProducesResponseType((int)HttpStatusCode.Created)]
         public async Task<ActionResult> PostJsonFromXml(string sourceFormat, CancellationToken cancellationToken)
         {
             if (String.IsNullOrEmpty(sourceFormat))
@@ -51,14 +52,14 @@ namespace AppTime.Api.Controllers.V1
 		}
 
 		/// <summary>
-		/// Creates a new json file from the given format from query arguments, the source file is in the body if the request 
+		/// Creates a new json file from the given format from query arguments, the source file is in the body of the request 
 		/// </summary>
 		/// <param name="sourceFormat">Format from which we will convert to json</param>
 		/// <param name="source">Source which we should convert</param>
 		/// <param name="cancellationToken">Cancellation token for the operation</param>
 		/// <returns>if successful returns code 201</returns>
 		/// <response code="201">Suceesfuly created</response>
-		/// <response code="404">XML file not found on disk.</response>
+		/// <response code="404">Format file not found between supported files.</response>
 		[HttpPost("/")]
 		[ProducesResponseType((int)HttpStatusCode.NotFound)]
 		[ProducesResponseType((int)HttpStatusCode.Created)]
@@ -92,8 +93,8 @@ namespace AppTime.Api.Controllers.V1
 		/// <param name="cancellationToken">Cancellation token for the operation</param>
 		/// <returns>if successful returns code 201</returns>
 		/// <response code="201">Suceesfuly created</response>
-		/// <response code="404">XML file not found on disk.</response>
-		/// <response code="400">sourceFormat parameter is missing.</response>
+		/// <response code="404">Format file not found between supported files..</response>
+		/// <response code="400">SourceFormat parameter is missing.</response>
 		[HttpPost("/")]
 		[ProducesResponseType((int)HttpStatusCode.NotFound)]
 		[ProducesResponseType((int)HttpStatusCode.Created)]
@@ -121,11 +122,11 @@ namespace AppTime.Api.Controllers.V1
 		}
 
 		/// <summary>
-		/// Download the file from our server
+		/// Download the file from our server.
 		/// </summary>
 		/// <param name="name">Name of the file to be downloaded</param>
 		/// <param name="cancellationToken">Cancellation token</param>
-		/// <returns>if successful returns file as bytes and code 200</returns>
+		/// <returns>if successful returns file as object with content field which is string and code 200.</returns>
 		/// <response code="200">Sucess</response>
 		/// <response code="400">Name is missing in the request</response>
 		/// <response code="404">Requested name was not found</response>
